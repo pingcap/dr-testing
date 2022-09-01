@@ -1,0 +1,182 @@
+morgo@ubuntu:~/go/src/github.com/pingcap/dr-testing/tikv-node-failure/scenario-2.6$ mysql < ../check-placement.sql
+node	aws_region	is_leader	c
+1	us-east-1	1	110
+1	us-east-1	0	117
+2	us-east-1	1	101
+2	us-east-1	0	127
+3	us-east-1	1	130
+3	us-east-1	0	97
+4	us-east-2	0	226
+5	us-east-2	0	228
+6	us-east-2	0	228
+7	us-west-2	0	113
+8	us-west-2	0	113
+9	us-west-2	0	115
+morgo@ubuntu:~/go/src/github.com/pingcap/dr-testing/tikv-node-failure/scenario-2.6$ kill -9 `ps aux | grep tikv1 | grep -v grep | awk '{print $2}'`
+morgo@ubuntu:~/go/src/github.com/pingcap/dr-testing/tikv-node-failure/scenario-2.6$ for i in `seq 1 10`; do mysql < ../check-placement.sql ; sleep 5; done;
+node	aws_region	is_leader	c
+1	us-east-1	0	227
+2	us-east-1	1	170
+2	us-east-1	0	61
+3	us-east-1	0	55
+3	us-east-1	1	173
+4	us-east-2	0	228
+5	us-east-2	0	229
+6	us-east-2	0	229
+7	us-west-2	0	113
+8	us-west-2	0	114
+9	us-west-2	0	116
+node	aws_region	is_leader	c
+1	us-east-1	0	227
+2	us-east-1	1	170
+2	us-east-1	0	61
+3	us-east-1	0	55
+3	us-east-1	1	173
+4	us-east-2	0	228
+5	us-east-2	0	229
+6	us-east-2	0	229
+7	us-west-2	0	112
+8	us-west-2	0	115
+9	us-west-2	0	116
+node	aws_region	is_leader	c
+1	us-east-1	0	227
+2	us-east-1	1	170
+2	us-east-1	0	61
+3	us-east-1	1	173
+3	us-east-1	0	55
+4	us-east-2	0	228
+5	us-east-2	0	229
+6	us-east-2	0	229
+7	us-west-2	0	112
+8	us-west-2	0	115
+9	us-west-2	0	116
+node	aws_region	is_leader	c
+1	us-east-1	0	227
+2	us-east-1	0	61
+2	us-east-1	1	170
+3	us-east-1	1	173
+3	us-east-1	0	55
+4	us-east-2	0	228
+5	us-east-2	0	229
+6	us-east-2	0	229
+7	us-west-2	0	112
+8	us-west-2	0	115
+9	us-west-2	0	116
+node	aws_region	is_leader	c
+1	us-east-1	0	229
+2	us-east-1	0	61
+2	us-east-1	1	170
+3	us-east-1	1	175
+3	us-east-1	0	55
+4	us-east-2	0	228
+5	us-east-2	0	231
+6	us-east-2	0	231
+7	us-west-2	0	114
+8	us-west-2	0	115
+9	us-west-2	0	116
+node	aws_region	is_leader	c
+1	us-east-1	0	229
+2	us-east-1	1	170
+2	us-east-1	0	61
+3	us-east-1	1	175
+3	us-east-1	0	55
+4	us-east-2	0	228
+5	us-east-2	0	231
+6	us-east-2	0	231
+7	us-west-2	0	114
+8	us-west-2	0	115
+9	us-west-2	0	116
+node	aws_region	is_leader	c
+1	us-east-1	0	229
+2	us-east-1	1	170
+2	us-east-1	0	61
+3	us-east-1	1	175
+3	us-east-1	0	55
+4	us-east-2	0	228
+5	us-east-2	0	231
+6	us-east-2	0	231
+7	us-west-2	0	114
+8	us-west-2	0	115
+9	us-west-2	0	116
+^C
+morgo@ubuntu:~/go/src/github.com/pingcap/dr-testing/tikv-node-failure/scenario-2.6$ mysql information_schema -e 'select * from tikv_store_status'
++----------+-----------------+-------------+------------------+--------------------------------------------------------------------------------------------------------------------+---------+----------+-----------+--------------+---------------+--------------+-------------+--------------+---------------+--------------------+-------------+---------------------+---------------------+------------------+
+| STORE_ID | ADDRESS         | STORE_STATE | STORE_STATE_NAME | LABEL                                                                                                              | VERSION | CAPACITY | AVAILABLE | LEADER_COUNT | LEADER_WEIGHT | LEADER_SCORE | LEADER_SIZE | REGION_COUNT | REGION_WEIGHT | REGION_SCORE       | REGION_SIZE | START_TS            | LAST_HEARTBEAT_TS   | UPTIME           |
++----------+-----------------+-------------+------------------+--------------------------------------------------------------------------------------------------------------------+---------+----------+-----------+--------------+---------------+--------------+-------------+--------------+---------------+--------------------+-------------+---------------------+---------------------+------------------+
+|        8 | 127.0.0.1:20161 |           0 | Disconnected     | [{"key": "region", "value": "us-east-1"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-1a"}] | 6.2.0   | 915.8GiB | 751.3GiB  |            0 |             1 |            0 |           0 |          259 |             1 |   30262.5224040851 |       22402 | 2022-09-01 14:39:02 | 2022-09-01 15:32:32 | 53m30.876562442s |
+|       10 | 127.0.0.1:20166 |           0 | Up               | [{"key": "region", "value": "us-east-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-2a"}] | 6.2.0   | 915.8GiB | 750.6GiB  |            0 |             0 |            0 |           0 |          265 |             1 | 30396.776825779314 |       22499 | 2022-09-01 15:28:54 | 2022-09-01 15:33:44 | 4m50.526342698s  |
+|       11 | 127.0.0.1:20165 |           0 | Up               | [{"key": "region", "value": "us-east-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-2a"}] | 6.2.0   | 915.8GiB | 750.6GiB  |            0 |             0 |            0 |           0 |          261 |             1 | 30411.025252584623 |       22508 | 2022-09-01 14:39:02 | 2022-09-01 15:33:43 | 54m41.151799674s |
+|        5 | 127.0.0.1:20169 |           0 | Up               | [{"key": "region", "value": "us-west-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-west-2a"}] | 6.2.0   | 915.8GiB | 750.6GiB  |            7 |             1 |            7 |           7 |          131 |             1 | 15056.878572432388 |       11144 | 2022-09-01 14:39:02 | 2022-09-01 15:33:42 | 54m40.807170407s |
+|        6 | 127.0.0.1:20163 |           0 | Up               | [{"key": "region", "value": "us-east-1"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-1a"}] | 6.2.0   | 915.8GiB | 750.6GiB  |          188 |             1 |          188 |       17363 |          263 |             1 | 30575.695215972413 |       22630 | 2022-09-01 14:39:02 | 2022-09-01 15:33:43 | 54m41.009819511s |
+|        7 | 127.0.0.1:20164 |           0 | Up               | [{"key": "region", "value": "us-east-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-2a"}] | 6.2.0   | 915.8GiB | 750.6GiB  |            0 |             0 |            0 |           0 |          260 |             1 | 30012.367690009403 |       22213 | 2022-09-01 14:39:02 | 2022-09-01 15:33:43 | 54m41.144148216s |
+|        9 | 127.0.0.1:20162 |           0 | Up               | [{"key": "region", "value": "us-east-1"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-1a"}] | 6.2.0   | 915.8GiB | 750.6GiB  |          192 |             1 |          192 |       16234 |          262 |             1 |  29975.93027568216 |       22186 | 2022-09-01 14:39:02 | 2022-09-01 15:33:43 | 54m41.138112572s |
+|        1 | 127.0.0.1:20168 |           0 | Up               | [{"key": "region", "value": "us-west-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-west-2a"}] | 6.2.0   | 915.8GiB | 750.6GiB  |           11 |             1 |           11 |          11 |          139 |             1 | 15120.378881587594 |       11191 | 2022-09-01 14:39:02 | 2022-09-01 15:33:42 | 54m40.801226584s |
+|        4 | 127.0.0.1:20167 |           0 | Up               | [{"key": "region", "value": "us-west-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-west-2a"}] | 6.2.0   | 915.8GiB | 750.6GiB  |           17 |             1 |           17 |          17 |          165 |             1 |  15290.64162644021 |       11317 | 2022-09-01 14:39:02 | 2022-09-01 15:33:43 | 54m41.18224708s  |
++----------+-----------------+-------------+------------------+--------------------------------------------------------------------------------------------------------------------+---------+----------+-----------+--------------+---------------+--------------+-------------+--------------+---------------+--------------------+-------------+---------------------+---------------------+------------------+
+morgo@ubuntu:~/go/src/github.com/pingcap/dr-testing/tikv-node-failure/scenario-2.6$ mysql < ../check-placement.sql | grep -v us-east-1
+node	aws_region	is_leader	c
+4	us-east-2	0	230
+5	us-east-2	0	232
+6	us-east-2	0	232
+7	us-west-2	0	114
+8	us-west-2	0	116
+9	us-west-2	0	117
+morgo@ubuntu:~/go/src/github.com/pingcap/dr-testing/tikv-node-failure/scenario-2.6$ /home/morgo/.tiup/components/tikv/v6.2.0/tikv-server --pd=127.0.0.1:2379 --data-dir=/mnt/evo970/data/tikv1 -A 127.0.0.1:20161 --log-file=/mnt/evo970/logs/tikv1.log --config=/mnt/evo970/etc/config1.toml &
+[5] 2935010
+morgo@ubuntu:~/go/src/github.com/pingcap/dr-testing/tikv-node-failure/scenario-2.6$
+morgo@ubuntu:~/go/src/github.com/pingcap/dr-testing/tikv-node-failure/scenario-2.6$ mysql < ../check-placement.sql
+node	aws_region	is_leader	c
+1	us-east-1	0	232
+2	us-east-1	1	170
+2	us-east-1	0	64
+3	us-east-1	0	55
+3	us-east-1	1	181
+4	us-east-2	0	233
+5	us-east-2	0	235
+6	us-east-2	0	235
+7	us-west-2	0	114
+8	us-west-2	0	120
+9	us-west-2	0	117
+morgo@ubuntu:~/go/src/github.com/pingcap/dr-testing/tikv-node-failure/scenario-2.6$ mysql information_schema -e 'select * from tikv_store_status'
++----------+-----------------+-------------+------------------+--------------------------------------------------------------------------------------------------------------------+---------+----------+-----------+--------------+---------------+--------------+-------------+--------------+---------------+--------------------+-------------+---------------------+---------------------+------------------+
+| STORE_ID | ADDRESS         | STORE_STATE | STORE_STATE_NAME | LABEL                                                                                                              | VERSION | CAPACITY | AVAILABLE | LEADER_COUNT | LEADER_WEIGHT | LEADER_SCORE | LEADER_SIZE | REGION_COUNT | REGION_WEIGHT | REGION_SCORE       | REGION_SIZE | START_TS            | LAST_HEARTBEAT_TS   | UPTIME           |
++----------+-----------------+-------------+------------------+--------------------------------------------------------------------------------------------------------------------+---------+----------+-----------+--------------+---------------+--------------+-------------+--------------+---------------+--------------------+-------------+---------------------+---------------------+------------------+
+|        1 | 127.0.0.1:20168 |           0 | Up               | [{"key": "region", "value": "us-west-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-west-2a"}] | 6.2.0   | 915.8GiB | 758GiB    |           11 |             1 |           11 |          11 |          141 |             1 | 15512.271224145594 |       11486 | 2022-09-01 14:39:02 | 2022-09-01 15:35:12 | 56m10.810876794s |
+|        4 | 127.0.0.1:20167 |           0 | Up               | [{"key": "region", "value": "us-west-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-west-2a"}] | 6.2.0   | 915.8GiB | 758GiB    |           17 |             1 |           17 |          17 |          165 |             1 | 15400.179755071482 |       11403 | 2022-09-01 14:39:02 | 2022-09-01 15:35:13 | 56m11.190921697s |
+|        9 | 127.0.0.1:20162 |           0 | Up               | [{"key": "region", "value": "us-east-1"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-1a"}] | 6.2.0   | 915.8GiB | 758GiB    |          131 |             1 |          131 |       11079 |          265 |             1 | 30353.284118124564 |       22475 | 2022-09-01 14:39:02 | 2022-09-01 15:35:13 | 56m11.146620907s |
+|        8 | 127.0.0.1:20161 |           0 | Up               | [{"key": "region", "value": "us-east-1"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-1a"}] | 6.2.0   | 915.8GiB | 758.2GiB  |          122 |             1 |          122 |       10965 |          263 |             1 | 30905.229669975706 |       22878 | 2022-09-01 15:34:58 | 2022-09-01 15:35:08 | 10.065543597s    |
+|       10 | 127.0.0.1:20166 |           0 | Up               | [{"key": "region", "value": "us-east-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-2a"}] | 6.2.0   | 915.8GiB | 758GiB    |            0 |             0 |            0 |           0 |          268 |             1 | 30896.758142003102 |       22878 | 2022-09-01 15:28:54 | 2022-09-01 15:35:14 | 6m20.534991711s  |
+|       11 | 127.0.0.1:20165 |           0 | Up               | [{"key": "region", "value": "us-east-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-2a"}] | 6.2.0   | 915.8GiB | 758GiB    |            0 |             0 |            0 |           0 |          263 |             1 |  30801.69887588433 |       22807 | 2022-09-01 14:39:02 | 2022-09-01 15:35:13 | 56m11.160425317s |
+|        5 | 127.0.0.1:20169 |           0 | Up               | [{"key": "region", "value": "us-west-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-west-2a"}] | 6.2.0   | 915.8GiB | 758GiB    |            7 |             1 |            7 |           7 |          134 |             1 | 15311.041978452426 |       11337 | 2022-09-01 14:39:02 | 2022-09-01 15:35:12 | 56m10.816857208s |
+|        6 | 127.0.0.1:20163 |           0 | Up               | [{"key": "region", "value": "us-east-1"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-1a"}] | 6.2.0   | 915.8GiB | 758GiB    |          132 |             1 |          132 |       12127 |          267 |             1 | 31208.069755579465 |       23108 | 2022-09-01 14:39:02 | 2022-09-01 15:35:13 | 56m11.02136033s  |
+|        7 | 127.0.0.1:20164 |           0 | Up               | [{"key": "region", "value": "us-east-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-2a"}] | 6.2.0   | 915.8GiB | 758GiB    |            0 |             0 |            0 |           0 |          265 |             1 | 30634.166671201918 |       22683 | 2022-09-01 14:39:02 | 2022-09-01 15:35:13 | 56m11.153534676s |
++----------+-----------------+-------------+------------------+--------------------------------------------------------------------------------------------------------------------+---------+----------+-----------+--------------+---------------+--------------+-------------+--------------+---------------+--------------------+-------------+---------------------+---------------------+------------------+
+morgo@ubuntu:~/go/src/github.com/pingcap/dr-testing/tikv-node-failure/scenario-2.6$ mysql information_schema -e 'select * from tikv_store_status'
++----------+-----------------+-------------+------------------+--------------------------------------------------------------------------------------------------------------------+---------+----------+-----------+--------------+---------------+--------------+-------------+--------------+---------------+--------------------+-------------+---------------------+---------------------+------------------+
+| STORE_ID | ADDRESS         | STORE_STATE | STORE_STATE_NAME | LABEL                                                                                                              | VERSION | CAPACITY | AVAILABLE | LEADER_COUNT | LEADER_WEIGHT | LEADER_SCORE | LEADER_SIZE | REGION_COUNT | REGION_WEIGHT | REGION_SCORE       | REGION_SIZE | START_TS            | LAST_HEARTBEAT_TS   | UPTIME           |
++----------+-----------------+-------------+------------------+--------------------------------------------------------------------------------------------------------------------+---------+----------+-----------+--------------+---------------+--------------+-------------+--------------+---------------+--------------------+-------------+---------------------+---------------------+------------------+
+|        4 | 127.0.0.1:20167 |           0 | Up               | [{"key": "region", "value": "us-west-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-west-2a"}] | 6.2.0   | 915.8GiB | 758GiB    |           17 |             1 |           17 |          17 |          165 |             1 | 15398.802565964515 |       11403 | 2022-09-01 14:39:02 | 2022-09-01 15:35:23 | 56m21.191971414s |
+|        1 | 127.0.0.1:20168 |           0 | Up               | [{"key": "region", "value": "us-west-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-west-2a"}] | 6.2.0   | 915.8GiB | 758GiB    |           11 |             1 |           11 |          11 |          141 |             1 | 15510.889899921382 |       11486 | 2022-09-01 14:39:02 | 2022-09-01 15:35:22 | 56m20.812127949s |
+|        6 | 127.0.0.1:20163 |           0 | Up               | [{"key": "region", "value": "us-east-1"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-1a"}] | 6.2.0   | 915.8GiB | 758GiB    |          132 |             1 |          132 |       12127 |          266 |             1 | 31077.006378237536 |       23013 | 2022-09-01 14:39:02 | 2022-09-01 15:35:23 | 56m21.022784431s |
+|        7 | 127.0.0.1:20164 |           0 | Up               | [{"key": "region", "value": "us-east-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-2a"}] | 6.2.0   | 915.8GiB | 758GiB    |            0 |             0 |            0 |           0 |          265 |             1 | 30631.432526840486 |       22683 | 2022-09-01 14:39:02 | 2022-09-01 15:35:23 | 56m21.154551163s |
+|        9 | 127.0.0.1:20162 |           0 | Up               | [{"key": "region", "value": "us-east-1"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-1a"}] | 6.2.0   | 915.8GiB | 758GiB    |          131 |             1 |          131 |       11079 |          265 |             1 | 30350.573065342018 |       22475 | 2022-09-01 14:39:02 | 2022-09-01 15:35:23 | 56m21.147513143s |
+|        8 | 127.0.0.1:20161 |           0 | Up               | [{"key": "region", "value": "us-east-1"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-1a"}] | 6.2.0   | 915.8GiB | 757.9GiB  |          122 |             1 |          122 |       10965 |          263 |             1 | 30904.136508469986 |       22878 | 2022-09-01 15:34:58 | 2022-09-01 15:35:18 | 20.066113611s    |
+|       10 | 127.0.0.1:20166 |           0 | Up               | [{"key": "region", "value": "us-east-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-2a"}] | 6.2.0   | 915.8GiB | 757.9GiB  |            0 |             0 |            0 |           0 |          268 |             1 | 30894.168508611314 |       22878 | 2022-09-01 15:28:54 | 2022-09-01 15:35:24 | 6m30.536409906s  |
+|       11 | 127.0.0.1:20165 |           0 | Up               | [{"key": "region", "value": "us-east-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-east-2a"}] | 6.2.0   | 915.8GiB | 758GiB    |            0 |             0 |            0 |           0 |          263 |             1 | 30798.945504267824 |       22807 | 2022-09-01 14:39:02 | 2022-09-01 15:35:23 | 56m21.161589294s |
+|        5 | 127.0.0.1:20169 |           0 | Up               | [{"key": "region", "value": "us-west-2"}, {"key": "disk", "value": "ssd"}, {"key": "zone", "value": "us-west-2a"}] | 6.2.0   | 915.8GiB | 758GiB    |            7 |             1 |            7 |           7 |          134 |             1 | 15309.678447830078 |       11337 | 2022-09-01 14:39:02 | 2022-09-01 15:35:22 | 56m20.81798037s  |
++----------+-----------------+-------------+------------------+--------------------------------------------------------------------------------------------------------------------+---------+----------+-----------+--------------+---------------+--------------+-------------+--------------+---------------+--------------------+-------------+---------------------+---------------------+------------------+
+morgo@ubuntu:~/go/src/github.com/pingcap/dr-testing/tikv-node-failure/scenario-2.6$ mysql < ../check-placement.sql | grep -v us-east-1
+node	aws_region	is_leader	c
+4	us-east-2	0	233
+5	us-east-2	0	234
+6	us-east-2	0	235
+7	us-west-2	0	114
+8	us-west-2	0	119
+9	us-west-2	0	119
+morgo@ubuntu:~/go/src/github.com/pingcap/dr-testing/tikv-node-failure/scenario-2.6$ mysql < ../check-placement.sql | grep  us-east-1
+1	us-east-1	1	113
+1	us-east-1	0	122
+2	us-east-1	0	120
+2	us-east-1	1	116
+3	us-east-1	1	123
+3	us-east-1	0	111
