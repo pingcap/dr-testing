@@ -17,7 +17,7 @@ spec:
     baseImage: grafana/grafana
     version: 7.5.11
     service:
-      type: NodePort
+      type: LoadBalancer
   initializer:
     baseImage: pingcap/tidb-monitor-initializer
     version: v6.1.0
