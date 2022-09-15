@@ -1,0 +1,79 @@
+{
+    "group_id": "cluster_rule",
+    "group_index": 100,
+    "group_override": true,
+    "rules": [
+        {
+            "group_id": "cluster_rule",
+            "id": "cluster_rule_0_primary_leader",
+            "index": 500,
+            "start_key": "",
+            "end_key": "",
+            "role": "leader",
+            "count": 1,
+            "label_constraints": [
+                {
+                    "key": "region",
+                    "op": "in",
+                    "values": [
+                        "us-east-1"
+                    ]
+                }
+            ]
+        },
+        {
+            "group_id": "cluster_rule",
+            "id": "cluster_rule_1_primary_voter",
+            "index": 500,
+            "start_key": "",
+            "end_key": "",
+            "role": "voter",
+            "count": 1,
+            "label_constraints": [
+                {
+                    "key": "region",
+                    "op": "in",
+                    "values": [
+                        "us-east-1"
+                    ]
+                }
+            ]
+        },
+        {
+            "group_id": "cluster_rule",
+            "id": "cluster_rule_3_us_east_2",
+            "index": 500,
+            "start_key": "",
+            "end_key": "",
+            "role": "voter",
+            "count": 2,
+            "label_constraints": [
+                {
+                    "key": "region",
+                    "op": "in",
+                    "values": [
+                        "us-east-2"
+                    ]
+                }
+            ]
+        },
+        {
+            "group_id": "cluster_rule",
+            "id": "cluster_rule_2_us_west_2",
+            "index": 500,
+            "start_key": "",
+            "end_key": "",
+            "role": "follower",
+            "count": 1,
+            "label_constraints": [
+                {
+                    "key": "region",
+                    "op": "in",
+                    "values": [
+                        "us-west-2"
+                    ]
+                }
+            ]
+        }
+    ]
+}

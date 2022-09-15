@@ -1,0 +1,79 @@
+apiVersion: pingcap.com/v1alpha1
+kind: TidbCluster
+metadata:
+  name: tc-cluster-2
+  namespace: cluster-2-namespace 
+spec:
+  version: v6.1.1
+  timezone: UTC
+  pvReclaimPolicy: Delete
+  enableDynamicConfiguration: true
+  configUpdateStrategy: RollingUpdate
+  clusterDomain: "cluster.local"
+  acrossK8s: true
+  cluster:
+    name: "tc-cluster-1"
+    namespace: "cluster-1-namespace"
+    clusterDomain: "cluster.local"
+  discovery: {}
+  pd:
+    #baseImage: pingcap/pd
+    baseImage: gcr.io/pingcap-public/dbaas/pd
+    version: v6.1.1-20220913-1663074807 
+    maxFailoverCount: 0
+    replicas: 1
+    requests:
+      storage: "100Gi"
+    config: |
+      [replication]
+        location-labels = ["failure-domain.beta.kubernetes.io/region", "failure-domain.beta.kubernetes.io/zone", "kubernetes.io/hostname"] 
+        max-replicas = 5
+      [log]
+        [log.file]
+          filename = "/var/log/pd/log/pd.log"             
+    nodeSelector:
+      dedicated: pd
+    tolerations:
+    - effect: NoSchedule
+      key: dedicated
+      operator: Equal
+      value: pd
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/component
+              operator: In
+              values:
+              - pd
+          topologyKey: "kubernetes.io/hostname"            
+  tikv:
+    baseImage: pingcap/tikv
+    maxFailoverCount: 0
+    replicas: 1
+    requests:
+      storage: "500Gi"
+    config: |
+      [log]
+        [log.file]
+          filename = "/var/log/tikv/log/tikv.log"
+      [server]
+        simplify-metrics = true 
+    nodeSelector:
+      dedicated: tikv
+    tolerations:
+    - effect: NoSchedule
+      key: dedicated
+      operator: Equal
+      value: tikv
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/component
+              operator: In
+              values:
+              - tikv
+          topologyKey: kubernetes.io/hostname    

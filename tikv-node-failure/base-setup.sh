@@ -58,24 +58,7 @@ done;
 
 sleep 10
 
-# Adjust us-east-2 stores to have zero-weight for leaders
-# This region is for quorum and not intended to server traffic.
-for STORE in `mysql -BNe "SELECT store_id FROM information_schema.tikv_store_status WHERE address IN ('127.0.0.1:20164', '127.0.0.1:20165', '127.0.0.1:20166');"`; do
- $PDCTL store weight $STORE 0 1
-done
-
-sleep 3
-
-# Create the base placement policy 
-mysql -e "CREATE PLACEMENT POLICY defaultpolicy LEADER_CONSTRAINTS=\"[+region=us-east-1]\" FOLLOWER_CONSTRAINTS=\"{+region=us-east-1: 1,+region=us-east-2: 2,+region=us-west-2: 1}\";"
-mysql -e "ALTER DATABASE test PLACEMENT POLICY=defaultpolicy;"
-
-# Alter the mysql system tables to use the placement rule too
-# This is because SHOW VARIABLES reads from a tikv table for the gc variables.
-mysql -e "ALTER DATABASE mysql PLACEMENT POLICY=defaultpolicy;"
-for TABLE in `mysql mysql -BNe "SHOW TABLES"`; do
- mysql mysql -e "ALTER TABLE $TABLE PLACEMENT POLICY=defaultpolicy;"
-done; 
+$PDCTL config placement-rules rule-bundle set cluster_rule --in="cluster_rule_group.json"
 
 # Create our test table, keep loading data into it in a loop
 mysql test -e "CREATE TABLE t1 (a INT NOT NULL PRIMARY KEY auto_increment, b varbinary(1024));"
