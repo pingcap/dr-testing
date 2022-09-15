@@ -22,6 +22,9 @@ spec:
     config: |
       [dashboard]
         internal-proxy = true
+      [log]
+        [log.file]
+          filename = "/var/log/pd.log"
       [replication]
         location-labels = ["topology.kubernetes.io/zone", "kubernetes.io/hostname"]
         max-replicas = 3
@@ -48,7 +51,11 @@ spec:
     replicas: 3
     requests:
       storage: "100Gi"
-    config: {}
+    config:
+      config: |
+        [log]
+          [log.file]
+            filename = "/var/log/tikv.log"
     nodeSelector:
       dedicated: tikv
     tolerations:
@@ -80,6 +87,10 @@ spec:
       externalTrafficPolicy: Local
       type: LoadBalancer
     config: |
+      [log]
+        [log.file]
+          filename = "/var/log/tidb.log"
+          max-backups = 3
       [performance]
         tcp-keep-alive = true
     annotations:

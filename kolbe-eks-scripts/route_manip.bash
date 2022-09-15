@@ -12,19 +12,8 @@ desc_routes(){
         jq -r '.RouteTables[] | select(.Tags | any(.Key=="aws:cloudformation:logical-id" and (.Value|startswith("Private")))) | .RouteTableId' 
 }
 
-declare -A cidrs=(
-    [us-east-1]="10.100.0.0/16"
-    [us-east-2]="10.101.0.0/16"
-    [us-west-2]="10.102.0.0/16"
-)
-declare -A routes=(
-    [us-east-1.us-east-2]=pcx-098f1e7ddfbe8f9c3
-    [us-east-1.us-west-2]=pcx-08062264271f3d12c
-    [us-east-2.us-east-1]=pcx-098f1e7ddfbe8f9c3
-    [us-east-2.us-west-2]=pcx-04700c30dc0949d56
-    [us-west-2.us-east-1]=pcx-08062264271f3d12c
-    [us-west-2.us-east-2]=pcx-04700c30dc0949d56
-)
+source ./eks_environment || exit
+
 
 del_route(){
     local region=$1

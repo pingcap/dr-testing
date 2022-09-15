@@ -1,3 +1,4 @@
+export AWS_PROFILE=pingcap
 declare -a contexts=(
     [0]="kolbe@test-us-east-1.us-east-1.eksctl.io"
     [1]="kolbe@test-us-east-2.us-east-2.eksctl.io"

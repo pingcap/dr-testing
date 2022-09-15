@@ -1,10 +1,6 @@
-export AWS_PROFILE=pingcap
-declare -A C=(
-    [kolbe@test-us-east-2.us-east-2.eksctl.io]="test-us-east-2"
-    [kolbe@test-us-east-1.us-east-1.eksctl.io]="test-us-east-1"
-    [kolbe@test-us-west-2.us-west-2.eksctl.io]="test-us-west-2"
-)
-declare -a regions=([0]="us-east-1" [1]="us-east-2" [2]="us-west-2")
+#!/usr/bin/env bash
+
+source ./eks_environment || exit
 
 for c in "${!C[@]}"
 do
