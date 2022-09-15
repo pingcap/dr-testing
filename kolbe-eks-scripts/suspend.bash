@@ -37,5 +37,5 @@ done
 
 for c in "${!C[@]}"
 do
-    kubectl --context=$c get nodes
+    kubectl --context="$c" get nodes
 done

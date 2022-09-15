@@ -8,7 +8,7 @@
 desc_routes(){
     local region=$1
     local cluster_name="test-$region"
-    aws --region="$region" ec2 describe-route-tables --filter Name=tag:"eksctl.cluster.k8s.io/v1alpha1/cluster-name",Values="$cluster_name" |
+    aws --region="$region" ec2 describe-route-tables --filter "Name=tag:eksctl.cluster.k8s.io/v1alpha1/cluster-name,Values=$cluster_name" |
         jq -r '.RouteTables[] | select(.Tags | any(.Key=="aws:cloudformation:logical-id" and (.Value|startswith("Private")))) | .RouteTableId' 
 }
 
