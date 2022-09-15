@@ -1,0 +1,74 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: test-us-west-2
+  region: us-west-2
+
+availabilityZones: ["us-west-2a","us-west-2b","us-west-2c","us-west-2d"]
+
+nodeGroups:
+  - name: admin-us-west-2
+    desiredCapacity: 1
+    privateNetworking: true
+    labels:
+      dedicated: admin
+
+  - name: tidb-us-west-2a
+    desiredCapacity: 1
+    privateNetworking: true
+    availabilityZones: ["us-west-2a"]
+    instanceType: c5.2xlarge
+    labels:
+      dedicated: tidb
+    taints:
+      dedicated: tidb:NoSchedule
+  - name: tidb-us-west-2d
+    desiredCapacity: 0
+    privateNetworking: true
+    availabilityZones: ["us-west-2d"]
+    instanceType: c5.2xlarge
+    labels:
+      dedicated: tidb
+    taints:
+      dedicated: tidb:NoSchedule
+  - name: tidb-us-west-2c
+    desiredCapacity: 1
+    privateNetworking: true
+    availabilityZones: ["us-west-2c"]
+    instanceType: c5.2xlarge
+    labels:
+      dedicated: tidb
+    taints:
+      dedicated: tidb:NoSchedule
+
+  - name: pd-us-west-2
+    desiredCapacity: 1
+    privateNetworking: true
+    availabilityZones: ["us-west-2d"]
+    instanceType: c5.xlarge
+    labels:
+      dedicated: pd
+    taints:
+      dedicated: pd:NoSchedule
+
+  - name: tikv-west-2a
+    desiredCapacity: 1
+    privateNetworking: true
+    availabilityZones: ["us-west-2a"]
+    instanceType: r5b.2xlarge
+    labels:
+      dedicated: tikv
+    taints:
+      dedicated: tikv:NoSchedule
+  - name: tikv-west-2c
+    desiredCapacity: 1
+    privateNetworking: true
+    availabilityZones: ["us-west-2c"]
+    instanceType: r5b.2xlarge
+    labels:
+      dedicated: tikv
+    taints:
+      dedicated: tikv:NoSchedule
+
+vpc:
+  cidr: 10.102.0.0/16

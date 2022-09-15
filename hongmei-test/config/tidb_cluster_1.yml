@@ -1,0 +1,126 @@
+apiVersion: pingcap.com/v1alpha1
+kind: TidbCluster
+
+metadata:
+  name: tc-cluster-1
+  namespace: cluster-1-namespace
+spec:
+  version: v6.1.1
+  timezone: UTC
+  pvReclaimPolicy: Delete
+  enableDynamicConfiguration: true
+  configUpdateStrategy: RollingUpdate
+  clusterDomain: "cluster.local"
+  acrossK8s: true
+  discovery: {}
+  pd:
+    baseImage: gcr.io/pingcap-public/dbaas/pd
+    version: v6.1.1-20220913-1663074807 
+    maxFailoverCount: 0
+    replicas: 2
+    requests:
+      storage: "100Gi"
+    config: |  
+      [replication]
+        location-labels = ["failure-domain.beta.kubernetes.io/region", "failure-domain.beta.kubernetes.io/zone", "kubernetes.io/hostname"]  
+        max-replicas = 5
+      [dashboard]
+      # dbaas specific configuration for proxy access to the dashboard https://github.com/tikv/pd/blob/af174e6401299e0d2ac8ef72a5f4beb48be535e2/conf/config.toml#L197
+      internal-proxy = true
+      [log]
+        [log.file]
+          filename = "/var/log/pd/log/pd.log"        
+    nodeSelector:
+      dedicated: pd
+    tolerations:
+    - effect: NoSchedule
+      key: dedicated
+      operator: Equal
+      value: pd
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/component
+              operator: In
+              values:
+              - pd
+          topologyKey: "kubernetes.io/hostname"       
+  tikv:
+    baseImage: pingcap/tikv
+    maxFailoverCount: 0
+    replicas: 2
+    requests:
+      storage: "500Gi"
+    config: |
+      [log]
+        [log.file]
+          filename = "/var/log/tikv/log/tikv.log"
+      [server]
+        simplify-metrics = true   
+    nodeSelector:
+      dedicated: tikv
+    tolerations:
+    - effect: NoSchedule
+      key: dedicated
+      operator: Equal
+      value: tikv
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/component
+              operator: In
+              values:
+              - tikv
+          topologyKey: kubernetes.io/hostname             
+  tidb:
+    baseImage: gcr.io/pingcap-public/dbaas/tidb
+    version: v6.1.1-20220913-1663074807
+    maxFailoverCount: 0
+    replicas: 1
+    service:
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+      externalTrafficPolicy: Local
+      type: LoadBalancer
+    requests:
+      storage: "100Gi" 
+    config: |
+      [performance]
+        tcp-keep-alive = true
+      [log]
+        slow-query-file = "/var/log/tidb/log/slowquery"
+        [log.file]
+          filename = "/var/log/tidb/log/tidb.log"
+          max-backups = 3        
+    annotations:
+      tidb.pingcap.com/sysctl-init: "true"
+    podSecurityContext:
+      sysctls:
+      - name: net.ipv4.tcp_keepalive_time
+        value: "300"
+      - name: net.ipv4.tcp_keepalive_intvl
+        value: "75"
+      - name: net.core.somaxconn
+        value: "32768"
+    separateSlowLog: true
+    nodeSelector:
+      dedicated: tidb
+    tolerations:
+    - effect: NoSchedule
+      key: dedicated
+      operator: Equal
+      value: tidb
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/component
+              operator: In
+              values:
+              - tidb
+          topologyKey: kubernetes.io/hostname      
