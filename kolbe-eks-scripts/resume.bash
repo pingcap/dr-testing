@@ -35,6 +35,8 @@ do
     kubectl --context "$c" -n "${C[$c]}" patch tc "$cluster" -p '{"spec":{"suspendAction":{"suspendStatefulSet":false}}}' --type=merge
 done
 
+aws ec2 start-instances --region=us-east-1 --instance-ids i-08906de8d4401fc69
+
 while ! read -r -n1 -t1
 do
     echo "press any key to continue"
@@ -44,3 +46,5 @@ do
     done
     echo
 done
+
+

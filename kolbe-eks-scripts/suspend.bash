@@ -35,7 +35,13 @@ do
     eksctl --region="$r" scale nodegroup --cluster=test-"$r" admin-"$r" -N 0 -m 0
 done
 
-for c in "${!C[@]}"
+aws ec2 stop-instances --region=us-east-1 --instance-ids i-08906de8d4401fc69
+
+while ! read -rn1 -t1
 do
-    kubectl --context="$c" get nodes
+    for c in "${!C[@]}"
+    do
+        kubectl --context="$c" get nodes
+    done
 done
+

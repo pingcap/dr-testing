@@ -10,6 +10,7 @@ nodeGroups:
   - name: admin-us-east-1
     desiredCapacity: 1
     privateNetworking: true
+    availabilityZones: ["us-east-1d"]
     labels:
       dedicated: admin
 
