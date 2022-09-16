@@ -45,7 +45,7 @@
             "index": 500,
             "start_key": "",
             "end_key": "",
-            "role": "voter",
+            "role": "follower",
             "count": 2,
             "label_constraints": [
                 {
@@ -63,7 +63,7 @@
             "index": 500,
             "start_key": "",
             "end_key": "",
-            "role": "follower",
+            "role": "voter",
             "count": 1,
             "label_constraints": [
                 {
